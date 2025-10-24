@@ -1,0 +1,15 @@
+{
+    "input": {
+        "input_source": {
+            "type": "url",
+            "value": "https://khang119966-deepseek-ocr-demo.hf.space/gradio_api/file=/tmp/gradio/189e4042de31142b3263281a61482b59832d2758bf3e5d9813a36cffd1a2b05c/chart.png"
+        },
+        "task_type": "doc_to_markdown",
+        "prompt": null,
+        "model_size": "Gundam",
+        "output_options": {
+            "include_bounding_boxes": true,
+            "include_visualization": true
+        }
+    }
+}

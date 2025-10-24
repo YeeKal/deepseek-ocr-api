@@ -1,0 +1,13 @@
+{
+    "input_source": {
+        "type": "url",
+        "value": "https://cdn.deepseekocr.io/home/wiki-free-ocr.webp"
+    },
+    "task_type": "doc_to_markdown",
+    "prompt": "",
+    "model_size": "Gundam",
+    "output_options": {
+        "include_bounding_boxes": false,
+        "include_visualization": false
+    }
+}

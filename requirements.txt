@@ -1,0 +1,21 @@
+# Runpod Serverless Worker
+runpod
+
+# Core ML and Vision Libraries - Version aligned with official references
+transformers==4.46.3
+tokenizers
+Pillow==10.1.0
+numpy
+accelerate
+
+# DeepSeek-OCR source code dependencies identified from official sources
+timm==0.9.12
+einops==0.7.0
+addict
+easydict
+
+# For handling URL image inputs
+requests==2.31.0
+
+# For Hugging Face Hub's high-speed model downloading
+hf_transfer
