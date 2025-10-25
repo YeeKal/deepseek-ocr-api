@@ -1,143 +1,55 @@
-<div align="center">
+## dev
 
-# RunPod CLI
-
-runpodctl is the CLI tool to automate / manage GPU pods for [runpod.io](https://runpod.io).
-
-_Note: All pods automatically come with runpodctl installed with a pod-scoped API key._
-
-</div>
-
-## Table of Contents
-
-- [RunPod CLI](#runpod-cli)
-  - [Table of Contents](#table-of-contents)
-  - [Get Started](#get-started)
-    - [Install](#install)
-      - [Linux/MacOS (WSL)](#linuxmacos-wsl)
-      - [MacOS](#macos)
-      - [Windows PowerShell](#windows-powershell)
-  - [Tutorial](#tutorial)
-  - [Transferring Data (file send/receive)](#transferring-data-file-sendreceive)
-    - [To send a file](#to-send-a-file)
-    - [To receive a file](#to-receive-a-file)
-    - [Using Google Drive](#using-google-drive)
-  - [Pod Commands](#pod-commands)
-  - [Acknowledgements](#acknowledgements)
-
-## Get Started
-
-### Install
-
-#### Linux/MacOS (WSL)
+- docker build -t deepseek-ocr-api:latest .
 
 ```bash
-# Download and install via wget
-wget -qO- cli.runpod.net | sudo bash
+# 1. 构建镜像
+docker build -t deepseek-ocr-api:latest .
+
+# 2. 后台启动容器
+docker run --rm --gpus all -d --name ocr-test-container deepseek-ocr-api:latest
+docker run --rm --gpus all -it --name ocr-test-container deepseek-ocr-api:latest  // 前台启动
+docker run --rm --gpus all -d -v docker_cache:/root/.cache/huggingface --name ocr-test-container deepseek-ocr-api:latest
+
+#  local test
+docker run --rm --gpus all -it -p 8000:8000 --name ocr-test-container -v docker_cache:/root/.cache/huggingface  deepseek-ocr-api:latest
+
+
+
+# (确保 test_payload.json 文件已创建)
+
+# 3. 发送作业
+runpodctl send job ocr-test-container test_payload.json
+
+# 4. 查看日志结果
+docker logs ocr-test-container
+
+# 5. 停止并清理容器
+docker stop ocr-test-container
 ```
+# 删除悬空镜像
+> docker image prune
 
-#### MacOS
+构建镜像时加上明确 tag，避免产生 <none> 镜像：
+> docker build -t deepseek-ocr-api:v1 .
 
-```bash
-# Using homebrew
-brew install runpod/runpodctl/runpodctl
-```
+## code
+- https://github.com/Bogdanovich77/DeekSeek-OCR---Dockerized-API/blob/main/start_server.py
 
-#### Windows PowerShell
+docker run \
+  --rm \
+  --gpus all \
+  -d \
+  --name ocr-test-container \
+  -v ~/huggingface_cache:/root/.cache/huggingface \
+  deepseek-ocr-api:latest
 
-```powershell
-wget https://github.com/runpod/runpodctl/releases/latest/download/runpodctl-windows-amd64.exe -O runpodctl.exe
-```
 
-## Tutorial
+curl -X POST http://localhost:8000/process  -H "Content-Type: application/json" -d @test_input.json
+     docker run --rm --gpus all -it -p 8000:8000  -v docker_cache:/root/.cache/huggingface --name ocr-test-container deepseek-ocr-api:latest
+docker run --rm --gpus all -it -p 8000:8000 --name ocr-test-container -v docker_cache:/root/.cache/huggingface  deepseek-ocr-api:latest
+        // "value": "https://raw.githubusercontent.com/deepseek-ai/DeepSeek-OCR/refs/heads/main/assets/fig1.png"
+nvidia-container-cli: requirement error: unsatisfied condition: cuda>=12.8, please update your driver to a newer version, or use an earlier cuda container: unknown
 
-Please checkout this [video tutorial](https://www.youtube.com/watch?v=QN1vdGhjcRc) for a detailed walkthrough of runpodctl.
-
-**Video Chapters:**
-
-- [Installing the latest version of runpodctl](https://www.youtube.com/watch?v=QN1vdGhjcRc&t=1384s)
-- [Uploading large datasets](https://www.youtube.com/watch?v=QN1vdGhjcRc&t=2068s)
-- [File transfers from PC to RunPod](https://www.youtube.com/watch?v=QN1vdGhjcRc&t=2106s)
-- [Downloading folders from RunPod](https://www.youtube.com/watch?v=QN1vdGhjcRc&t=2549s)
-- [Adding runpodctl to your environment path](https://www.youtube.com/watch?v=QN1vdGhjcRc&t=2589s)
-- [Downloading model files](https://www.youtube.com/watch?v=QN1vdGhjcRc&t=4871s)
-
-## Transferring Data (file send/receive)
-
-**Note:** The `send` and `receive` commands do not require API keys due to the built-in security of one-time codes.
-
-Run the following on the computer that has the file you want to send
-
-### To send a file
-
-```bash
-runpodctl send data.txt
-```
-
-_Example output:_
-
-```bash
-Sending 'data.txt' (5 B)
-Code is: 8338-galileo-collect-fidel
-On the other computer run
-
-runpodctl receive 8338-galileo-collect-fidel
-```
-
-### To receive a file
-
-```bash
-runpodctl receive 8338-galileo-collect-fidel
-```
-
-_Example output:_
-
-```bash
-Receiving 'data.txt' (5 B)
-
-Receiving (<-149.36.0.243:8692)
-data.txt 100% |████████████████████| ( 5/ 5B, 0.040 kB/s)
-```
-
-### Using Google Drive
-
-You can use the following links for google colab
-
-[Send](https://colab.research.google.com/drive/1UaODD9iGswnKF7SZfsvwHDGWWwLziOsr#scrollTo=2nlcIAY3gGLt)
-
-[Receive](https://colab.research.google.com/drive/1ot8pODgystx1D6_zvsALDSvjACBF1cj6#scrollTo=RF1bMqhBOpSZ)
-
-## Pod Commands
-
-Before using pod commands, configure the API key obtained from your [RunPod account](https://runpod.io/console/user/settings).
-
-```bash
-# configure API key
-runpodctl config --apiKey={key}
-
-# Get all pods
-runpodctl get pod
-
-# Get a pod
-runpodctl get pod {podId}
-
-# Start an ondemand pod.
-runpodctl start pod {podId}
-
-# Start a spot pod with bid.
-# The bid price you set is the price you will pay if not outbid:
-runpodctl start pod {podId} --bid=0.3
-
-# Stop a pod
-runpodctl stop pod {podId}
-```
-
-For a comprehensive list of commands, visit [RunPod CLI documentation](docs/runpodctl.md).
-
-## Acknowledgements
-
-- [cobra](https://github.com/spf13/cobra)
-- [croc](https://github.com/schollz/croc)
-- [golang](https://go.dev/)
-- [nebula](https://github.com/slackhq/nebula)
-- [viper](https://github.com/spf13/viper)
+error starting container: Error response from daemon: failed to create task for container: failed to create shim task: OCI runtime create failed: runc create failed: unable to start container process: error during container init: error running hook #0: error running hook: exit status 1, stdout: , stderr: Auto-detected mode as 'legacy'
+nvidia-container-cli: requirement error: unsatisfied condition: cuda>=12.8, please update your driver to a newer version, or use an earlier cuda container: unknown
