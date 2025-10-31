@@ -1,12 +1,10 @@
 import os
-import sys
 import runpod
 import torch
 import base64
 import requests
 import re
 import tempfile
-from pathlib import Path
 from PIL import Image, ImageDraw
 import io
 
